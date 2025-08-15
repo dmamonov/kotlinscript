@@ -1,18 +1,23 @@
 {
   "name": "Kotlin + kscript Dev",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu", // Ubuntu (glibc), not Alpine
   "features": {
     "ghcr.io/devcontainers/features/java:1": {
-      "version": "temurin-21" // Java 21 for modern Kotlin
-    }
+      "version": "21",        // <-- just the number
+      "jdkDistro": "tem"      // <-- Eclipse Temurin
+    },
+    "ghcr.io/devcontainers/features/git:1": {}
   },
   "postCreateCommand": "bash .devcontainer/setup.sh",
   "customizations": {
     "vscode": {
       "extensions": [
-        "fwcd.kotlin", // Kotlin language support
-        "mathiasfrohlich.Kotlin" // Kotlin syntax highlighting
-      ]
+        "fwcd.kotlin",           // Kotlin language support (LSP)
+        "mathiasfrohlich.Kotlin" // Extra syntax highlighting (optional)
+      ],
+      "settings": {
+        "kotlin.languageServer.path": "kotlin-language-server" // auto-resolves
+      }
     }
   },
   "remoteUser": "vscode"
