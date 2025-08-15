@@ -1,0 +1,19 @@
+{
+  "name": "Kotlin + kscript Dev",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "temurin-21" // Java 21 for modern Kotlin
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "fwcd.kotlin", // Kotlin language support
+        "mathiasfrohlich.Kotlin" // Kotlin syntax highlighting
+      ]
+    }
+  },
+  "remoteUser": "vscode"
+}
