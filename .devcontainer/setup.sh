@@ -43,23 +43,23 @@ set +u
 yes | sdk install kotlin || yes | sdk upgrade kotlin || true
 set -u
 
-# ---------------- kscript via SDKMAN, with guarded fallback ----------------
-set +u
-yes | sdk install kscript || true
-set -u
+# # ---------------- kscript via SDKMAN, with guarded fallback ----------------
+# set +u
+# yes | sdk install kscript || true
+# set -u
 
-if ! command -v kscript >/dev/null 2>&1; then
-  echo "SDKMAN did not provide kscript; using GitHub release…"
-  # Current canonical org is kscript-lang
-  url="https://github.com/kscript-lang/kscript/releases/latest/download/kscript"
-  # -f: fail on HTTP errors, -L: follow redirects, -o: output file
-  if curl -fL -o /usr/local/bin/kscript "$url"; then
-    chmod +x /usr/local/bin/kscript
-  else
-    echo "Fallback download failed: $url"
-    exit 1
-  fi
-fi
+# if ! command -v kscript >/dev/null 2>&1; then
+#   echo "SDKMAN did not provide kscript; using GitHub release…"
+#   # Current canonical org is kscript-lang
+#   url="https://github.com/kscript-lang/kscript/releases/latest/download/kscript"
+#   # -f: fail on HTTP errors, -L: follow redirects, -o: output file
+#   if curl -fL -o /usr/local/bin/kscript "$url"; then
+#     chmod +x /usr/local/bin/kscript
+#   else
+#     echo "Fallback download failed: $url"
+#     exit 1
+#   fi
+# fi
 
 # ---------------- Sanity checks ----------------
 java -version
