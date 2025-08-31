@@ -3,8 +3,10 @@ package ansi.compose2
 
 import teya.ansi.compose2.AlignLeft
 import teya.ansi.compose2.AlignLineCenter
+import teya.ansi.compose2.AlignRight
 import teya.ansi.compose2.EMPTY_BOX
 import teya.ansi.compose2.FixedSpec
+import teya.ansi.compose2.HorizontalRepeatSpec
 import teya.ansi.compose2.VerticalRepeatSpec
 import teya.ansi.compose2.TextBlock
 import teya.ansi.compose2.lineSpec
@@ -34,7 +36,7 @@ fun main() {
             topBottom.arrange(EMPTY_BOX)
         )
     }
-    if (true) {
+    if (false) {
 
         println()
         println(
@@ -46,22 +48,28 @@ fun main() {
         )
     }
 
-    if (false) {
+    if (true) {
         println()
         println(
-            lineSpec(
-                VerticalRepeatSpec("|"),
-                FixedSpec(TextBlock("Hello")),
-                VerticalRepeatSpec("|"),
-                stackSpec(
-                    FixedSpec(TextBlock("1")),
-                    AlignLeft(FixedSpec(TextBlock("L"))),
+            stackSpec(
+                HorizontalRepeatSpec("-"),
+                lineSpec(
+                    VerticalRepeatSpec("|"),
                     FixedSpec(TextBlock("Hello")),
-                    AlignLineCenter(FixedSpec(TextBlock("X")))
+                    VerticalRepeatSpec("|"),
+                    stackSpec(
+                        FixedSpec(TextBlock("1")),
+                        AlignLeft(FixedSpec(TextBlock("L"))),
+                        FixedSpec(TextBlock("Hello")),
+                        AlignLineCenter(FixedSpec(TextBlock("X"))),
+                        //TODO right is not aligned and pull center (what?) to the left
+                        AlignRight(FixedSpec(TextBlock("R")))
+                    ),
+                    VerticalRepeatSpec("|"),
+                    FixedSpec(TextBlock("World")),
+                    VerticalRepeatSpec("|")
                 ),
-                VerticalRepeatSpec("|"),
-                FixedSpec(TextBlock("World")),
-                VerticalRepeatSpec("|")
+                HorizontalRepeatSpec("-"),
             ).arrange(EMPTY_BOX)
         )
     }

@@ -47,9 +47,9 @@ data class Box(val width: Width, val height: Height) {
 
     val hasArea: Boolean get() = width.value > 0 && height.value > 0
 
-    fun toWidth(newWidth: Width): Box = Box(newWidth, height)
+    fun withWidth(newWidth: Width): Box = Box(newWidth, height)
     fun minWidth(minWidth: Width): Box = Box(maxOf(minWidth, WIDTH1), height)
-    fun toHeight(newHeight: Height): Box = Box(width, newHeight)
+    fun withHeight(newHeight: Height): Box = Box(width, newHeight)
     fun minHeight(minHeight: Height): Box = Box(width, maxOf(minHeight, height))
     fun minBox(minBox: Box): Box = Box(maxOf(width, minBox.width), maxOf(height, minBox.height))
 }

@@ -28,6 +28,15 @@ class VerticalRepeatSpec(val symbol: String) : Spec() {
     }
 }
 
+class HorizontalRepeatSpec(val symbol: String) : Spec() {
+    override fun minFit(): Box = UNIT_BOX
+
+    override fun arrange(minSlot: Box): Block {
+        val fitBounds = minFit().minWidth(minSlot.width)
+        return RepeatBlock(fitBounds, symbol)
+    }
+}
+
 class AlignLeft(private val spec: Spec) : Spec() {
     override fun minFit(): Box = spec.minFit()
 
@@ -58,7 +67,7 @@ class AlignLineCenter(private val spec: Spec) : Spec() {
     override fun arrange(minSlot: Box): Block {
         val block = spec.arrange(minSlot)
         val padding: Box = minSlot - block.box.width
-        val leftPadding = padding.toWidth(padding.width / 2)
+        val leftPadding = padding.withWidth(padding.width / 2)
         val rightPadding = padding - leftPadding.width
         return if (leftPadding.hasArea) {
             LineBlock(
@@ -79,9 +88,10 @@ class AlignLineCenter(private val spec: Spec) : Spec() {
 
 
 class StackSpec(private val top: Spec, private val bottom: Spec) : Spec() {
+    val topFit = top.minFit()
+    val bottomFit = bottom.minFit()
+
     override fun minFit(): Box {
-        val topFit = top.minFit()
-        val bottomFit = bottom.minFit()
         return Box(
             maxOf(
                 topFit.width,
@@ -94,8 +104,8 @@ class StackSpec(private val top: Spec, private val bottom: Spec) : Spec() {
     override fun arrange(minSlot: Box): Block {
         val fitBounds = minFit().minHeight(minSlot.height)
         return StackBlock(
-            top.arrange(fitBounds),
-            bottom.arrange(fitBounds)
+            top.arrange(fitBounds.withHeight(topFit.height)),
+            bottom.arrange(fitBounds.withHeight(bottomFit.height))
         )
     }
 }
@@ -110,9 +120,10 @@ fun stackSpec(vararg specs: Spec): Spec {
 }
 
 class LineSpec(private val left: Spec, private val right: Spec) : Spec() {
+    val leftFit = left.minFit()
+    val rightFit = right.minFit()
+
     override fun minFit(): Box {
-        val leftFit = left.minFit()
-        val rightFit = right.minFit()
         return Box(
             leftFit.width + rightFit.width,
             maxOf(
@@ -125,8 +136,8 @@ class LineSpec(private val left: Spec, private val right: Spec) : Spec() {
     override fun arrange(minSlot: Box): Block {
         val fitBounds = minFit().minHeight(minSlot.height)
         return LineBlock(
-            left.arrange(fitBounds),
-            right.arrange(fitBounds)
+            left.arrange(fitBounds.withWidth(leftFit.width)),
+            right.arrange(fitBounds.withWidth(rightFit.width))
         )
     }
 }
