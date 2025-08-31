@@ -1,4 +1,4 @@
-package teya.ansi.compose2
+package ansi.compose2
 
 abstract class Spec {
     abstract fun minFit(): Box
