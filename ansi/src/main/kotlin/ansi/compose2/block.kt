@@ -54,15 +54,6 @@ class StackBlock(private val top: Block, private val bottom: Block) : Block() {
     }
 }
 
-
-fun stack(vararg blocks: Block): Block {
-    return when (blocks.size) {
-        0 -> EmptyBlock()
-        1 -> blocks[0]
-        else -> StackBlock(blocks[0], stack(*blocks.toList().subList(1, blocks.size).toTypedArray()))
-    }
-}
-
 class LineBlock(private val left: Block, private val right: Block) : Block() {
     override val box = left.box.line(right.box)
 
@@ -77,13 +68,5 @@ class LineBlock(private val left: Block, private val right: Block) : Block() {
         } else {
             nothing
         }
-    }
-}
-
-fun line(vararg blocks: Block): Block {
-    return when (blocks.size) {
-        0 -> EmptyBlock()
-        1 -> blocks[0]
-        else -> LineBlock(blocks[0], line(*blocks.toList().subList(1, blocks.size).toTypedArray()))
     }
 }
