@@ -1,5 +1,7 @@
 package ansi.compose2
 
+import ansi.UiSymbols
+
 abstract class Spec {
     abstract fun minFit(): Box
     abstract fun arrange(minSlot: Box): Block
@@ -19,21 +21,24 @@ class FixedSpec(val block: Block) : Spec() {
     }
 }
 
-class VerticalRepeatSpec(val symbol: String) : Spec() {
+class VerticalRepeatSpec(val symbol: String = UiSymbols.BOX_V) : Spec() {
     override fun minFit(): Box = UNIT_BOX
 
     override fun arrange(minSlot: Box): Block {
         val fitBounds = minFit().minHeight(minSlot.height)
-        return RepeatBlock(fitBounds, symbol)
+        return RepeatBlock(fitBounds, symbol, symbol, symbol)
     }
 }
 
-class HorizontalRepeatSpec(val symbol: String) : Spec() {
+class HorizontalRepeatSpec(val symbol: String=UiSymbols.BOX_H, left: String? = null, right: String? = null) : Spec() {
+    val left = left ?: symbol
+    val right = right ?: symbol
     override fun minFit(): Box = UNIT_BOX
 
     override fun arrange(minSlot: Box): Block {
         val fitBounds = minFit().minWidth(minSlot.width)
-        return RepeatBlock(fitBounds, symbol)
+        println(fitBounds)
+        return RepeatBlock(fitBounds, symbol, left, right)
     }
 }
 

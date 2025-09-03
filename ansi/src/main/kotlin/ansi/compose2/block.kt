@@ -1,6 +1,6 @@
 package ansi.compose2
 
-abstract class Block  {
+abstract class Block {
     abstract val box: Box
     abstract fun char(point: Point): String
 
@@ -26,8 +26,17 @@ class TextBlock(input: String) : Block() {
     }
 }
 
-class RepeatBlock(override val box: Box, private val symbol: String) : Block() {
-    override fun char(point: Point): String = symbol
+class RepeatBlock(
+    override val box: Box,
+    private val symbol: String,
+    private val left: String,
+    private val right: String
+) : Block() {
+    override fun char(point: Point): String = when (point.col.value + 1) {
+        1 -> left
+        box.width.value -> right
+        else -> symbol
+    }
 }
 
 

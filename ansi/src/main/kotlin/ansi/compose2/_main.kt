@@ -1,5 +1,7 @@
 package ansi.compose2
 
+import ansi.UiSymbols
+
 fun main() {
     if (false) {
         println(FixedSpec(TextBlock("One Word")).arrange(EMPTY_BOX))
@@ -39,7 +41,7 @@ fun main() {
         println()
         println(
             stackSpec(
-                HorizontalRepeatSpec("-"),
+                HorizontalRepeatSpec(UiSymbols.BOX_H, UiSymbols.BOX_TL, UiSymbols.BOX_TR),
                 lineSpec(
                     VerticalRepeatSpec("|"),
                     FixedSpec(TextBlock("Hello")),
@@ -56,7 +58,7 @@ fun main() {
                     FixedSpec(TextBlock("World")),
                     VerticalRepeatSpec("|")
                 ),
-                HorizontalRepeatSpec("-"),
+                HorizontalRepeatSpec(UiSymbols.BOX_H, UiSymbols.BOX_BL, UiSymbols.BOX_BR),
             ).arrange(EMPTY_BOX)
         )
     }
