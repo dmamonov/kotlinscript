@@ -1,4 +1,4 @@
-package ansi.compose2
+package ansi.compose
 
 abstract class Block {
     abstract val box: Box

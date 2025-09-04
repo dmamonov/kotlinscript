@@ -1,4 +1,4 @@
-package ansi.compose2
+package ansi.compose
 
 import ansi.UiSymbols
 
