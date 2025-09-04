@@ -148,8 +148,8 @@ fun main() {
         .frame(DOUBLE_SQUARE_FRAME).print()
 
     val field = "   ".line()
-    val black = field.bg(BLACK)
-    val white = field.bg(WHITE)
+    val black = field.bg(ColorFull(red = 0x7B, green = 0x3F, blue = 0x00))
+    val white = field.bg(ColorFull(red = 0xB8, green = 0x73, blue = 0x33))
     val blackWhite2 = black sequence white
     val blackWhite4 = blackWhite2 sequence blackWhite2
     val blackWhite8 = blackWhite4 sequence blackWhite4
@@ -176,7 +176,19 @@ fun main() {
                 Point(row = ROW_1, col = Col(2)) offset Point(row = Row(7))
     }
 
-    val whitePawn = figure(ChessFigure.PAWN.white)
+//    val whitePawn = figure(ChessFigure.PAWN.white)
+    val whitePawn = figure(ChessFigure.PAWN.white).fg(WHITE.light)
+    val blackPawn = figure(ChessFigure.PAWN.black).fg(BLACK)
+    val blackRook = figure(ChessFigure.ROOK.black).fg(BLACK)
+    val whiteRook = figure(ChessFigure.ROOK.white).fg(WHITE.light)
+    val blackKnight = figure(ChessFigure.KNIGHT.black).fg(BLACK)
+    val whiteKnight = figure(ChessFigure.KNIGHT.white).fg(WHITE.light)
+    val blackBishop = figure(ChessFigure.BISHOP.black).fg(BLACK)
+    val whiteBishop = figure(ChessFigure.BISHOP.white).fg(WHITE.light)
+    val blackQueen = figure(ChessFigure.QUEEN.black).fg(BLACK)
+    val whiteQueen = figure(ChessFigure.QUEEN.white).fg(WHITE.light)
+    val blackKing = figure(ChessFigure.KING.black).fg(BLACK)
+    val whiteKing = figure(ChessFigure.KING.white).fg(WHITE.light)
 
 
     fun put(figure: Block, place: String): Block {
@@ -186,7 +198,7 @@ fun main() {
         return figure offset Point(row, col)
     }
 
-    val whitePawns = put(whitePawn, "a2") over
+    val rank2Figures = put(whitePawn, "a2") over
             put(whitePawn, "b2") over
             put(whitePawn, "c2") over
             put(whitePawn, "d2") over
@@ -195,7 +207,38 @@ fun main() {
             put(whitePawn, "g2") over
             put(whitePawn, "h2")
 
-    (whitePawns transparentBackground board).print()
+    val rank1Figures = put(whiteRook, "a1") over
+            put(whiteKnight, "b1") over
+            put(whiteBishop, "c1") over
+            put(whiteQueen, "d1") over
+            put(whiteKing, "e1") over
+            put(whiteBishop, "f1") over
+            put(whiteKnight, "g1") over
+            put(whiteRook, "h1")
+
+    val rank7Figures = put(blackPawn, "a7") over
+            put(blackPawn, "b7") over
+            put(blackPawn, "c7") over
+            put(blackPawn, "d7") over
+            put(blackPawn, "e7") over
+            put(blackPawn, "f7") over
+            put(blackPawn, "g7") over
+            put(blackPawn, "h7")
+
+    val rank8Figures = put(blackRook, "a8") over
+            put(blackKnight, "b8") over
+            put(blackBishop, "c8") over
+            put(blackQueen, "d8") over
+            put(blackKing, "e8") over
+            put(blackBishop, "f8") over
+            put(blackKnight, "g8") over
+            put(blackRook, "h8")
+
+    (rank1Figures transparentBackground
+    (rank8Figures transparentBackground
+            (rank7Figures transparentBackground
+                    (rank2Figures transparentBackground board)))).print()
+
 }
 
 data class SpriteBlock(val block: Block, val transparent: String = BLANK_SYMBOL.char) : Block {

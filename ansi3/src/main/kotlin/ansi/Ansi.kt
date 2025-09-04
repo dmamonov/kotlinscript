@@ -72,9 +72,9 @@ val lightColors16 = dimColors16.map { it.light }
 val colors16 = dimColors16 + lightColors16
 
 data class ColorRgb6(
-    val red: Int,
-    val green: Int,
-    val blue: Int
+    val red: Int = 0,
+    val green: Int = 0,
+    val blue: Int = 0,
 ) : AnsiColor {
     init {
         require(red in 0..5) { "Red component must be in range 0..5" }
@@ -84,6 +84,21 @@ data class ColorRgb6(
 
     override val fg: String get() = ansi("38;5;${16 + (36 * red) + (6 * green) + blue}")
     override val bg: String get() = ansi("48;5;${16 + (36 * red) + (6 * green) + blue}")
+}
+
+data class ColorFull(
+    val red: Int = 0,
+    val green: Int = 0,
+    val blue: Int = 0,
+) : AnsiColor {
+    init {
+        require(red in 0..255) { "Red component must be in range 0..255" }
+        require(green in 0..255) { "Green component must be in range 0..255" }
+        require(blue in 0..255) { "Blue component must be in range 0..255" }
+    }
+
+    override val fg: String get() = ansi("38;2;${red};${green};${blue}")
+    override val bg: String get() = ansi("48;2;${red};${green};${blue}")
 }
 
 data class ColorGray24(val code: Int) : AnsiColor {
