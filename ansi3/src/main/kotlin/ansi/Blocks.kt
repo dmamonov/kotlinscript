@@ -172,7 +172,7 @@ fun main() {
                 .frame())).print()
 
     fun figure(symbol: String): Block {
-        return symbol.line().fg(WHITE.light) offset Point(col = COL_1) offset
+        return symbol.line().bold.fg(WHITE.light) offset Point(col = COL_1) offset
                 Point(row = ROW_1, col = Col(2)) offset Point(row = Row(7))
     }
 
