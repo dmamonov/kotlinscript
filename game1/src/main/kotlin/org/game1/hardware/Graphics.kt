@@ -7,7 +7,7 @@ import org.example.org.game1.algebra.XY
 @JvmInline
 value class ColorIndex(val value: Byte) {
     companion object {
-        val TRANSPARENT = ColorIndex(0x0FF.toByte())
+        val TRANSPARENT = ColorIndex(0.toByte())
     }
 
     val isTransparent: Boolean

@@ -2,6 +2,7 @@ package org.example.org.game1.hardware.java2d
 
 import org.example.org.game1.algebra.*
 import org.example.org.game1.hardware.*
+import java.awt.Color
 import java.awt.Container
 import java.awt.Graphics
 import java.awt.Graphics2D
@@ -26,7 +27,7 @@ private class Java2DPalette : Palette {
             red[i] = (i).toByte()  // 0..252
             green[i] = (i).toByte()
             blue[i] = (i).toByte()
-            a[i] = (-1).toByte()     // opaque (0xFF)
+            a[i] = if (i == ColorIndex.TRANSPARENT.value.toInt()) 0 else (-1).toByte()     // opaque (0xFF)
         }
     }
 
@@ -49,6 +50,12 @@ private class Java2DSurface(override val size: Size) : Surface {
         size.width.value, size.height.value, BufferedImage.TYPE_BYTE_INDEXED, javaPalette.indexColorModel
     )
     private val data: ByteArray = (image.raster.dataBuffer as java.awt.image.DataBufferByte).data
+    private val graphics2D = (image.graphics as Graphics2D).apply {
+        setRenderingHint(
+            RenderingHints.KEY_INTERPOLATION,
+            RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+        )
+    }
 
     override fun clear(color: ColorIndex) {
         java.util.Arrays.fill(data, color.value)
@@ -63,13 +70,21 @@ private class Java2DSurface(override val size: Size) : Surface {
     override fun set(xy: XY, image: Image) {
         val delta = xy.toDelta
         val surfaceBox = ((image.size.box + delta) intersect size.box) ?: return
-        surfaceBox.sy.coordinates.forEach { surfaceY ->
-            val yOffset = surfaceY.value * size.width.value
-            surfaceBox.sx.coordinates.forEach { surfaceX ->
-                val imageXY = XY(surfaceX - delta.dx, surfaceY - delta.dy)
-                val color = image[imageXY]
-                if (color.isColor) {
-                    data[yOffset + surfaceX.value] = color.value
+        val imageSurface = image as Java2DSurface
+        graphics2D.drawImage(
+            imageSurface.image,
+            xy.x.value, xy.y.value,
+            null
+        )
+        if (false) {
+            surfaceBox.sy.coordinates.forEach { surfaceY ->
+                val yOffset = surfaceY.value * size.width.value
+                surfaceBox.sx.coordinates.forEach { surfaceX ->
+                    val imageXY = XY(surfaceX - delta.dx, surfaceY - delta.dy)
+                    val color = image[imageXY]
+                    if (color.isColor) {
+                        data[yOffset + surfaceX.value] = color.value
+                    }
                 }
             }
         }
@@ -292,6 +307,12 @@ fun main() {
 
         display.render { surface ->
             surface.clear(ColorIndex(1))
+
+            (0 until 24).forEach { y ->
+                (0 until 32).forEach { x ->
+                    surface[xy(x * 8, y * 8)] = myImage
+                }
+            }
 
             val y = frameNumber % 100
             for (x in 0 until surface.size.width.value) {
