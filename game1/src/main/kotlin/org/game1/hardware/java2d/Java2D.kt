@@ -6,136 +6,87 @@ import java.awt.Color
 import java.awt.Container
 import java.awt.Graphics
 import java.awt.Graphics2D
+import java.awt.GraphicsConfiguration
+import java.awt.GraphicsEnvironment
 import java.awt.RenderingHints
+import java.awt.Transparency
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
-import java.awt.image.BufferedImage
-import java.awt.image.IndexColorModel
+import java.awt.image.VolatileImage
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
+import javax.swing.Timer
+import kotlin.Array
+import kotlin.Boolean
+import kotlin.Byte
+import kotlin.Int
+import kotlin.TODO
+import kotlin.Unit
+import kotlin.apply
+import kotlin.collections.forEach
+import kotlin.collections.forEachIndexed
+import kotlin.collections.minusAssign
+import kotlin.collections.mutableSetOf
+import kotlin.collections.plusAssign
+import kotlin.io.println
+import kotlin.run
 
-private class Java2DPalette : Palette {
-    val paletteSize = 256
-    val red = ByteArray(paletteSize)
-    val green = ByteArray(paletteSize)
-    val blue = ByteArray(paletteSize)
-    val a = ByteArray(paletteSize)
-
-    init {
-        // Example: grayscale ramp
-        for (i in 0 until paletteSize) {
-            red[i] = (i).toByte()  // 0..252
-            green[i] = (i).toByte()
-            blue[i] = (i).toByte()
-            a[i] = if (i == ColorIndex.TRANSPARENT.value.toInt()) 0 else (-1).toByte()     // opaque (0xFF)
-        }
-    }
-
-    val indexColorModel = IndexColorModel(
-        8,                // bits per pixel
-        paletteSize,      // size of palette
-        red, green, blue, a
+private class Java2DSurface(override val size: Size, gc: GraphicsConfiguration) : Surface {
+    val image: VolatileImage = gc.createCompatibleVolatileImage(
+        size.width.value,
+        size.height.value,
+        Transparency.TRANSLUCENT
     )
 
-    override fun get(index: ColorIndex): ColorRGB {
-        val v = index.value.toInt() and 0xFF
-        return ColorRGB(v.toUByte(), v.toUByte(), v.toUByte())
-    }
-}
+    override fun render(renderer: (Canvas) -> Unit) {
+        val graphics2D = image.createGraphics()
+        try {
+            renderer(object : Canvas {
+                override val size: Size
+                    get() = this@Java2DSurface.size
 
-private val javaPalette = Java2DPalette()
-
-private class Java2DSurface(override val size: Size) : Surface {
-    val image = BufferedImage(
-        size.width.value, size.height.value, BufferedImage.TYPE_BYTE_INDEXED, javaPalette.indexColorModel
-    )
-    private val data: ByteArray = (image.raster.dataBuffer as java.awt.image.DataBufferByte).data
-    private val graphics2D = (image.graphics as Graphics2D).apply {
-        setRenderingHint(
-            RenderingHints.KEY_INTERPOLATION,
-            RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
-        )
-    }
-
-    override fun clear(color: ColorIndex) {
-        java.util.Arrays.fill(data, color.value)
-    }
-
-    override fun set(xy: XY, color: ColorIndex) {
-        if (color.value != 0.toByte() && xy in size) {
-            data[xy.y.value * size.width.value + xy.x.value] = color.value
-        }
-    }
-
-    override fun set(xy: XY, image: Image) {
-        val delta = xy.toDelta
-        val surfaceBox = ((image.size.box + delta) intersect size.box) ?: return
-        val imageSurface = image as Java2DSurface
-        graphics2D.drawImage(
-            imageSurface.image,
-            xy.x.value, xy.y.value,
-            null
-        )
-        if (false) {
-            surfaceBox.sy.coordinates.forEach { surfaceY ->
-                val yOffset = surfaceY.value * size.width.value
-                surfaceBox.sx.coordinates.forEach { surfaceX ->
-                    val imageXY = XY(surfaceX - delta.dx, surfaceY - delta.dy)
-                    val color = image[imageXY]
-                    if (color.isColor) {
-                        data[yOffset + surfaceX.value] = color.value
-                    }
+                override fun clear(color: ColorIndex) {
+                    graphics2D.color = Color.YELLOW
+                    graphics2D.fillRect(0, 0, size.width.value, size.height.value)
                 }
-            }
-        }
-    }
 
-    override fun crop(box: Box): Surface = object : Surface {
-        override val size: Size = box.size
-        private val delta = box.min.toDelta
+                override fun set(
+                    xy: XY,
+                    color: ColorIndex
+                ) {
+                    graphics2D.color = if (color.isTransparent) Color.BLUE else Color(0, 0, 0, 255)
+                    graphics2D.fillRect(xy.x.value, xy.y.value, 1, 1)
 
-        override fun clear(color: ColorIndex) {
-            (size.box + delta).points.forEach { point ->
-                this@Java2DSurface[point] = color
-            }
-        }
+                }
 
-        override fun set(xy: XY, color: ColorIndex) {
-            if (xy in size) {
-                this@Java2DSurface[xy + delta] = color
-            }
-        }
+                override fun set(xy: XY, image: Image) {
+                    graphics2D.drawImage(
+                        (image as Java2DSurface).image,
+                        xy.x.value, xy.y.value,
+                        null
+                    )
+                }
 
-        override fun set(xy: XY, image: Image) {
-            if (xy in size) {
-                this@Java2DSurface[xy + delta] = image
-            }
-        }
-
-        override fun crop(box: Box): Surface {
-            val effectiveBox = (size.box intersect box) ?: ZERO_BOX
-            return this@Java2DSurface.crop(effectiveBox + delta)
-        }
-
-        override fun get(xy: XY): ColorIndex {
-            return this@Java2DSurface[xy + delta]
+            })
+        } finally {
+            graphics2D.dispose()
         }
     }
 
     override fun get(xy: XY): ColorIndex {
         return if (xy in size) {
-            ColorIndex(data[xy.y.value * size.width.value + xy.x.value])
+            TODO() //ColorIndex(data[xy.y.value * size.width.value + xy.x.value])
         } else {
             ColorIndex.TRANSPARENT
         }
     }
 }
 
-
 private class PixelPanel(
-    val size: Size, val scale: Int
+    val size: Size, val scale: Int,
+    gc: GraphicsConfiguration
 ) : Container() {
-    val surface = Java2DSurface(size)
+    val surface = Java2DSurface(size, gc)
 
     override fun paint(g: Graphics) {
         (g as Graphics2D).apply {
@@ -155,6 +106,11 @@ private class PixelPanel(
 }
 
 fun java2d(): Hardware = object : Hardware {
+    val gc: GraphicsConfiguration = GraphicsEnvironment
+        .getLocalGraphicsEnvironment()
+        .defaultScreenDevice
+        .defaultConfiguration
+
     val gamepad1 = object : Gamepad {
         val buttons = mutableSetOf<Button>()
 
@@ -164,7 +120,7 @@ fun java2d(): Hardware = object : Hardware {
     override fun initDisplay(size: Size): Display = object : Display {
         override val size: Size = size
         val pixelSize = 3
-        val panel = PixelPanel(size, pixelSize)
+        val panel = PixelPanel(size, pixelSize, gc)
 
         val window = JFrame("$size").apply {
             contentPane = panel
@@ -212,18 +168,15 @@ fun java2d(): Hardware = object : Hardware {
         override val palette: Palette
             get() = object : Palette {
                 override fun get(index: ColorIndex): ColorRGB {
-                    val intIndex = index.value.toInt() and 0xFF
-                    return ColorRGB(
-                        red = javaPalette.red[intIndex].toUByte(),
-                        green = javaPalette.green[intIndex].toUByte(),
-                        blue = javaPalette.blue[intIndex].toUByte(),
-                    )
+                    TODO()
                 }
             }
 
-        override fun render(renderer: (Surface) -> Unit) {
+        override fun render(renderer: (Canvas) -> Unit) {
             fun renderImpl() {
-                renderer(panel.surface)
+                panel.surface.render { canvas ->
+                    renderer(canvas)
+                }
                 panel.repaint()
             }
             if (!SwingUtilities.isEventDispatchThread()) {
@@ -235,6 +188,7 @@ fun java2d(): Hardware = object : Hardware {
             }
         }
 
+
         override fun exit() {
             window.dispose()
         }
@@ -245,13 +199,17 @@ fun java2d(): Hardware = object : Hardware {
             Size(
                 Width(pixels[0].size),
                 Height(pixels.size)
-            )
+            ),
+            gc
         ).apply {
-            pixels.forEachIndexed { y, row ->
-                row.forEachIndexed { x, color ->
-                    this@apply[xy(x, y)] = color
+            render { canvas ->
+                pixels.forEachIndexed { y, row ->
+                    row.forEachIndexed { x, color ->
+                        canvas[xy(x, y)] = color
+                    }
                 }
             }
+
         }
     }
 
@@ -287,9 +245,9 @@ fun main() {
 
     var frameNumber = 0
     var lastNow = System.currentTimeMillis()
-    val fpsStep = 60
+    val fpsStep = 25
     var myPoint = xy(10, 10)
-    javax.swing.Timer(1000 / 60) {  // ~60 FPS
+    Timer(1000 / 60) {  // ~60 FPS
         frameNumber++
 
         if (Button.LEFT in gamepad) {
@@ -305,21 +263,20 @@ fun main() {
             myPoint += dxy(dy = 1)
         }
 
-        display.render { surface ->
-            surface.clear(ColorIndex(1))
+        display.render { canvas ->
+            canvas.clear(ColorIndex(1))
 
             (0 until 24).forEach { y ->
                 (0 until 32).forEach { x ->
-                    surface[xy(x * 8, y * 8)] = myImage
+                    canvas[xy(x * 8, y * 8)] = myImage
                 }
             }
 
             val y = frameNumber % 100
-            for (x in 0 until surface.size.width.value) {
-                surface[xy(x, x)] = ColorIndex(Byte.MAX_VALUE)
+            for (x in 0 until canvas.size.width.value) {
+                canvas[xy(x, x)] = ColorIndex(Byte.MAX_VALUE)
             }
-            surface[myPoint] = myImage
-
+            canvas[myPoint] = myImage
         }
         if (frameNumber % fpsStep == 0) {
             val now = System.currentTimeMillis()
