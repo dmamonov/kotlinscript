@@ -28,7 +28,7 @@ interface Hardware {
             val pixels = lines[firstRow + rowIndex].trim().split(bySpaces)
             check(pixels.size == width) { "Wrong number of pixels in row-index $rowIndex, expected $width, actual ${pixels.size}" }
 
-            pixels.map { ColorIndex(if (it=="0") 0 else 1.toByte()) }.toTypedArray()
+            pixels.map { ColorIndex(it.toInt()) }.toTypedArray()
         }.toTypedArray()
 
         return createImage(matrix)

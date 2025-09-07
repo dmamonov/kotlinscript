@@ -1,8 +1,12 @@
 package org.example.org.game1.physics
 
-// ==========================================================
-// World & input snapshots (immutable)
-// ==========================================================
+class Simulation(val world: World) {
+    val bodies = mutableListOf<Body>()
+
+
+}
+
+
 data class World(
     val gravity: Acceleration2D,
     val groundFriction: Double, // dimensionless factor μ
