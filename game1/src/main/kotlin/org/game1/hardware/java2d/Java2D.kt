@@ -251,13 +251,44 @@ fun java2d(): Hardware = object : Hardware {
 }
 
 fun main() {
-    val display = java2d().initDisplay()
+    val hardware = java2d()
+    val gamepad = hardware.gamepad(GamepadDevice.Gamepad1)
+    val myImage = hardware.parseImage(
+        """
+        P2
+        8 8 
+        1 1 1 1 1 1 1 1 
+        1 0 0 0 0 0 0 1
+        1 0 0 0 0 0 0 1
+        1 0 0 0 0 0 0 1
+        1 0 0 0 0 0 0 1
+        1 0 0 0 0 0 0 1
+        1 0 0 0 0 0 0 1
+        1 1 1 1 1 1 1 1
+    """.trimIndent()
+    )
+    val display = hardware.initDisplay()
+
 
     var frameNumber = 0
     var lastNow = System.currentTimeMillis()
     val fpsStep = 60
+    var myPoint = xy(10, 10)
     javax.swing.Timer(1000 / 60) {  // ~60 FPS
         frameNumber++
+
+        if (Button.LEFT in gamepad) {
+            myPoint -= dxy(dx = 1)
+        }
+        if (Button.RIGHT in gamepad) {
+            myPoint += dxy(dx = 1)
+        }
+        if (Button.UP in gamepad) {
+            myPoint -= dxy(dy = 1)
+        }
+        if (Button.DOWN in gamepad) {
+            myPoint += dxy(dy = 1)
+        }
 
         display.render { surface ->
             surface.clear(ColorIndex(1))
@@ -266,6 +297,8 @@ fun main() {
             for (x in 0 until surface.size.width.value) {
                 surface[xy(x, x)] = ColorIndex(Byte.MAX_VALUE)
             }
+            surface[myPoint] = myImage
+
         }
         if (frameNumber % fpsStep == 0) {
             val now = System.currentTimeMillis()
