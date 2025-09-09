@@ -9,7 +9,9 @@ value class ColorIndex(val value: Int) {
         val TRANSPARENT = ColorIndex(0)
         val colors = listOf(
             Color(0, 0, 0, 255),
+            Color.WHITE,
             Color.RED,
+
             Color.RED.darker(),
             Color.PINK,
             Color.PINK.darker(),
@@ -25,7 +27,7 @@ value class ColorIndex(val value: Int) {
             Color.CYAN.darker(),
             Color.BLUE,
             Color.BLUE.darker(),
-            Color.WHITE.darker(),
+
             Color.LIGHT_GRAY,
             Color.GRAY,
             Color.DARK_GRAY,

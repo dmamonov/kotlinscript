@@ -1,5 +1,7 @@
 package org.example.org.game1.algebra
 
+import java.util.stream.Stream
+
 data class Segment<AXIS : Axis>(val min: Coordinate<AXIS>, val max: Coordinate<AXIS>) {
     init {
         require(min.value <= max.value) { "min must be <= max.value" }
@@ -24,6 +26,17 @@ data class Segment<AXIS : Axis>(val min: Coordinate<AXIS>, val max: Coordinate<A
     val coordinates: Iterable<Coordinate<AXIS>> = (min.value until max.value).map {
         Coordinate(it)
     }
+
+    fun split(length: Length<AXIS>): Stream<Coordinate<AXIS>> {
+        return Stream.iterate(
+            Coordinate(this.min.value - (this.min.value % length.value)),
+            { it < this.max },
+            { Coordinate(it.value + length.value) }
+        )
+    }
+
+
+    val isEmpty: Boolean get() = min == max
 }
 
 typealias SX = Segment<XAxis>

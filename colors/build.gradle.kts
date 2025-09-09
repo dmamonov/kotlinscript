@@ -1,9 +1,8 @@
 plugins {
     kotlin("jvm") version "2.2.0"
-    application
 }
 
-group = "ansi5"
+group = "org.colors"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -19,8 +18,4 @@ tasks.test {
 }
 kotlin {
     jvmToolchain(21)
-}
-
-application {
-    mainClass.set("MainKt")
 }

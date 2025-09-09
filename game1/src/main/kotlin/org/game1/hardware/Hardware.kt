@@ -21,7 +21,7 @@ interface Hardware {
         val size = lines[sizeIndex].trim().split(bySpaces)
         require(size.size == 2) { "Wrong size format, expecting width and height" }
 
-        val firstRow = sizeIndex + 1
+        val firstRow = sizeIndex + 2
         val width = size[0].toInt().also { check(it > 0) { "Wrong width $it" } }
         val height = size[1].toInt().also { check(it > 0) { "Wrong height $it" } }
         val matrix = (0 until height).map { rowIndex ->

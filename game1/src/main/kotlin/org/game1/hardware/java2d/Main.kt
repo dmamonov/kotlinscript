@@ -14,14 +14,15 @@ fun main() {
         """
         P2
         8 8 
-        9 9 9 9 9 9 9 9 
-        9 0 0 0 0 0 0 9
-        9 0 0 0 0 0 0 9
-        9 0 0 0 0 0 0 9
-        9 0 0 0 0 0 0 9
-        9 0 0 0 0 0 0 9
-        9 0 0 0 0 0 0 9
-        9 9 9 9 9 9 9 9
+        1
+        0 0 1 1 1 1 0 0 
+        0 0 0 1 1 0 0 0
+        0 0 1 1 1 1 0 0
+        0 1 0 1 1 0 1 0
+        1 0 0 1 1 0 0 1
+        1 0 1 0 0 1 0 1
+        0 0 1 0 0 1 0 0
+        0 1 1 0 0 1 1 0
     """.trimIndent()
     )
     val display = hardware.initDisplay()
@@ -48,9 +49,9 @@ fun main() {
         }
 
         display.render { canvas ->
-            canvas.clear(ColorIndex(1))
-            (0 until 24).forEach { y ->
-                (0 until 32).forEach { x ->
+            canvas.clear(ColorIndex(4))
+            (0 until 24 step 2).forEach { y ->
+                (0 until 32 step 2).forEach { x ->
                     canvas[xy(x * 8, y * 8)] = myImage
                 }
             }
