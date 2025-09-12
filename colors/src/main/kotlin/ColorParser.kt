@@ -3,6 +3,7 @@ package org.example
 import java.awt.Color
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.times
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -68,27 +69,56 @@ fun main() {
         return "\u001b[48;2;${color.red};${color.green};${color.blue}m${name}\u001b[0m"
     }
 
-    Files.lines(Path.of("colors/palette.csv")).forEach { line ->
-        val trim = line.trim()
-        val items = trim.split(";").map { it.trim() }
-        if (!trim.startsWith("#") && items.size>1) {
-            try {
-                val name = items[0]
-                val colors = items.subList(1, items.size).map { parse(it) }
-                val width = 12
-                fun c(index: Int): String {
-                    return if (index < colors.size) {
-                        ansi("".padEnd(width), colors[index])
-                    } else ".".padEnd(width)
-                }
-                println("${name.padStart(width)} ${c(0)}${c(1)}${c(2)}${c(3)}${c(4)}")
-            } catch (e: Exception) {
-                System.err.println("Error parsing line: $line")
-                e.printStackTrace()
-                System.exit(0)
-            }
-        } else println()
+    val colors: List<Pair<String, List<Color>>> = Files.lines(Path.of("colors/palette.csv"))
+        .map { it.trim() }
+        .filter { !it.isBlank() && !it.startsWith("#") }
+        .map { line -> line.trim().split(";").map { it.trim() } }
+        .map { items ->
+            println(items)
+            val name = items[0]
+            val colors = items.subList(1, items.size).map { parse(it) }
+            check(colors.isNotEmpty()) { "Color group must have at least 1 colors: $name" }
+            name to colors
+        }.toList()
+
+    val names = colors.associate { it.second[0] to it.first }
+    fun closestRgbColor(target: Color): Color {
+        return names.filter { !it.value.startsWith("unknown") }.keys.minByOrNull { color ->
+            val dr = color.red - target.red
+            val dg = color.green - target.green
+            val db = color.blue - target.blue
+            dr * dr + dg * dg + db * db
+        } ?: throw IllegalArgumentException("Color list is empty")
     }
 
+    val missing = mutableSetOf<Color>()
+    val width = 12
+    for ((_, colorGroup) in colors) {
+        val hasMissingColor = colorGroup.map { names[it] }.filter { it == null }.size > 0
+        if (hasMissingColor || !hasMissingColor) {
+            for (color in colorGroup) {
+                val colorName = names[color]
+                print(ansi((colorName ?: "<<????>>").padEnd(width), color))
+                if (colorName == null) missing += color
+            }
+            println()
+        }
+    }
 
+    names.entries.forEach { entry ->
+        val color = entry.key
+        val name = entry.value
+        if (name.startsWith("unknown")) {
+            val betterName = names[closestRgbColor(color)]!!
+            print(name+" "+ansi(betterName.padEnd(width), entry.key))
+            println()
+        }
+    }
+    if (missing.isNotEmpty()) {
+        println("Missing colors:")
+        for (color in missing) {
+            println(ansi("r${color.red} g${color.green} b${color.blue}", color))
+        }
+
+    }
 }
