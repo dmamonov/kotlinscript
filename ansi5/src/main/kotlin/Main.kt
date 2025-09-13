@@ -109,6 +109,7 @@ class Hodler(private var state:State = State(), private var undo:State? = null) 
 fun main() {
     setRawMode()
 
+
     var state = State()
 
     fun switchPixel(reset: Boolean = false) {
