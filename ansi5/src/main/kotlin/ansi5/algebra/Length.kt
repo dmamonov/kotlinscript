@@ -11,12 +11,14 @@ value class Length<AXIS : Axis>(val value: Int) : Comparable<Length<AXIS>> {
     operator fun contains(coordinate: Coordinate<AXIS>): Boolean = coordinate.value in 0 until value
 
     val asOffset: Offset<AXIS> get() = Offset(value)
+    val asCoordinate: Coordinate<AXIS> get() = Coordinate(value)
 
     override fun toString(): String = "$value"
 }
 
 typealias Width = Length<Horizontal>
 typealias Height = Length<Vertical>
+typealias Duration = Length<Temporal>
 
 fun Width.toHeight(): Height = Height(this.value)
 fun Height.toWidth(): Width = Width(this.value)
@@ -40,8 +42,10 @@ data class Size(val width: Width, val height: Height) {
     )
 
     val rows: Iterable<Row> get() = (0 until height.value).map { Row(it) }
+    val rows1: Iterable<Row> get() = (1.. height.value).map { Row(it) }
 
     val cols: Iterable<Col> get() = (0 until width.value).map { Col(it) }
+    val cols1: Iterable<Col> get() = (1.. width.value).map { Col(it) }
 
     operator fun contains(point: Point): Boolean = point.col in width && point.row in height
 }

@@ -48,7 +48,7 @@ data class Color16(
     private val red: Boolean,
     private val green: Boolean,
     private val blue: Boolean,
-    private val light: Boolean
+    val bright: Boolean
 ) : AnsiColor {
     companion object {
         val BLACK = Color16(false, false, false, false)
@@ -61,13 +61,13 @@ data class Color16(
         val WHITE = Color16(true, true, true, false)
 
         val DIM_COLORS = listOf(BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE)
-        val BRIGHT_COLORS = DIM_COLORS.map { it.bright }
+        val BRIGHT_COLORS = DIM_COLORS.map { it.makeBrigh }
         val COLORS = DIM_COLORS + BRIGHT_COLORS
     }
 
     override val fgCode: String
         get() {
-            val base = if (light) 90 else 30
+            val base = if (bright) 90 else 30
             val offset = (if (red) 1 else 0) + (if (green) 2 else 0) + (if (blue) 4 else 0)
             return (base + offset).toString()
         }
@@ -75,13 +75,13 @@ data class Color16(
 
     override val bgCode: String
         get() {
-            val base = if (light) 100 else 40
+            val base = if (bright) 100 else 40
             val offset = (if (red) 1 else 0) + (if (green) 2 else 0) + (if (blue) 4 else 0)
             return (base + offset).toString()
         }
 
-    val bright: Color16 get() = this.copy(light = true)
-    val dim: Color16 get() = this.copy(light = false)
+    val makeBrigh: Color16 get() = this.copy(bright = true)
+    val makeDim: Color16 get() = this.copy(bright = false)
 }
 
 

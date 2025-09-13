@@ -35,13 +35,17 @@ val Matrix<Symbol>.underline: Matrix<Symbol>
         symbol.copy(underline = true)
     }
 
-fun Matrix<Symbol>.show(blank: Symbol = Symbol.BLANK): Matrix<Symbol> {
-    val render = this.size.rows.joinToString("\n") { row ->
+fun Matrix<Symbol>.render(blank: Symbol = Symbol.BLANK): String {
+    return this.size.rows.joinToString("\n") { row ->
         this.size.cols.joinToString(separator = "") { col ->
             val point = Point(row, col)
             (this[point] ?: blank).toString()
         }
     }
+}
+
+fun Matrix<Symbol>.show(blank: Symbol = Symbol.BLANK): Matrix<Symbol> {
+    val render = this.render()
     println(render)
     System.out.flush()
 

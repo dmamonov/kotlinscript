@@ -14,6 +14,7 @@ value class Coordinate<AXIS : Axis>(val value: Int) : Comparable<Coordinate<AXIS
 
 typealias Row = Coordinate<Vertical>
 typealias Col = Coordinate<Horizontal>
+typealias Frame = Coordinate<Temporal>
 
 fun Row.toCol(): Col = Col(this.value)
 fun Col.toRos(): Row = Row(this.value)
