@@ -107,6 +107,16 @@ class Hodler(private var state:State = State(), private var undo:State? = null) 
 }
 
 fun main() {
+    if (true){
+        ansi5.ansi.main()
+        return
+
+
+
+
+
+    }
+
     setRawMode()
 
 
